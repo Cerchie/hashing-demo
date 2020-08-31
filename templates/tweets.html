@@ -24,7 +24,13 @@
 <ul>
     {% for tweet in tweets %}
     <li>
-        {tweet.text}
+
+        <b> {{tweet.user.username}} </b> - {{tweet.text}}
+        {% if session['user_id'] == tweet.user_id%}
+        <form style="display: inline;" action="/tweets/delete">
+            <button class="btn btn-sm btn-danger">
+                X
+            </button></form> {% endif %}
     </li>
     {% endfor %}
 </ul>
