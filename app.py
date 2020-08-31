@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, session, flash
 from flask_debugtoolbar import DebugToolbarExtension
-from  models import connect_db, db, User
-from forms import UserForm
+from  models import connect_db, db, User, Tweet
+from forms import UserForm, TweetForm
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgres:///auth_demo"
@@ -19,13 +19,14 @@ toolbar = DebugToolbarExtension
 def homepage():
     return render_template('index.html')
 
-@app.route('/tweets')
+@app.route('/tweets', methods=['GET', 'POST'])
 def show_tweets():
     if "user_id" not in session:
         flash("please log in first")
         return redirect('/')
-
-    return render_template("tweets.html")
+    form = TweetForm()
+    all_tweets = Tweet.query.all()
+    return render_template("tweets.html", form=form, tweets = all_tweets)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register_user():
@@ -63,4 +64,5 @@ def login_user():
 @app.route('/logout')
 def logout_user():
     session.pop('user_id')
+    flash("successful logout")
     return redirect('/')
