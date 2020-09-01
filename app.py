@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect, session, flash
 from flask_debugtoolbar import DebugToolbarExtension
-from  models import connect_db, db, User, Feedback
+from  models import connect_db, db, User, Feedback, Tweet
 from forms import UserForm, TweetForm, LoginForm
 from sqlalchemy.exc import IntegrityError
 
@@ -57,8 +57,11 @@ def register_user():
     if form.validate_on_submit():
         username = form.username.data
         password = form.password.data
-        new_user = User.register(username, password)
-        
+        email = form.email.data
+        first_name = form.first_name.data
+        last_name = form.last_name.data
+        new_user = User.register(username, password, email, first_name, last_name)
+
         db.session.add(new_user)
         try: 
             db.session.commit()
