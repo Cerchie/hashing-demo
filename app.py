@@ -40,12 +40,6 @@ def show_tweets():
 
 @app.route('/users/<int:id>')
 def display_user(id):
-    form = UserForm()
-    password = form.password.data
-    username = form.username.data
-    email = form.email.data
-    first_name = form.first_name.data
-    last_name = form.last_name.data
     user = User.query.get_or_404(id)
     all_feedback = Feedback.query.all()
 
@@ -55,7 +49,7 @@ def display_user(id):
         flash("Please log in first", "danger")
         return redirect('/login')
     if session['user_id'] == user.username:
-        return render_template('user_info.html', user=user, email=email, first_name=first_name, last_name=last_name, all_feedback=all_feedback)
+        return render_template('user_info.html', user=user)
 #-------------------
 # DELETE ROUTES
 #-------------------
