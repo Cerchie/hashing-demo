@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %} Stupid Twitter/Feedback
+{% endblock %}
+
+{% block content %}
+
+<button class="btn btn-success" type="submit">Post Feedback</button>
+</form>
+
+<div>{% for feedb in feedback %}
+    <div>
+        <div class="card my-4">
+            <div class="card-body">
+                <h5 class="card-title text-info">{{feedback.user.username}}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Date goes here</h6>
+                <p class="card-text">{{feedback.text}}</p>
+                {% if session['user_id'] == feedback.user_id%}
+                <form style="display: inline;" action="/tweets/{{tweet.id}}" method="POST">
+                    <button class="btn btn-sm btn-danger">
+                        X
+                    </button></form> {% endif %}
+            </div>
+        </div>
+
+    </div>
+    {% endfor %}</div>
+
+{% endblock %}

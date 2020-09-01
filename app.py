@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, session, flash
 from flask_debugtoolbar import DebugToolbarExtension
 from  models import connect_db, db, User, Feedback, Tweet
-from forms import UserForm, TweetForm, LoginForm
+from forms import UserForm, TweetForm, LoginForm, FeedbackForm
 from sqlalchemy.exc import IntegrityError
 
 app = Flask(__name__)
@@ -37,6 +37,25 @@ def show_tweets():
         flash('tweet created', "success")
         return redirect('/tweets')
     return render_template("tweets.html", form=form, tweets = all_tweets)
+
+@app.route('/users/<int:id>')
+def display_user(id):
+    form = UserForm()
+    password = form.password.data
+    username = form.username.data
+    email = form.email.data
+    first_name = form.first_name.data
+    last_name = form.last_name.data
+    user = User.query.get_or_404(id)
+    all_feedback = Feedback.query.all()
+
+    db.session.add(all_feedback)
+    db.session.commit()
+    if 'user_id' not in session:
+        flash("Please log in first", "danger")
+        return redirect('/login')
+    if session['user_id'] == user.username:
+        return render_template('user_info.html', user=user, email=email, first_name=first_name, last_name=last_name, all_feedback=all_feedback)
 #-------------------
 # DELETE ROUTES
 #-------------------
@@ -84,7 +103,9 @@ def delete_user(id):
         flash('feedback deleted', "primary")
         return redirect('/')
     
-
+#-------------
+#other user routes, register, login and logout
+#-------------
 @app.route('/register', methods=['GET', 'POST'])
 def register_user():
     form = UserForm()
@@ -130,18 +151,41 @@ def logout_user():
     flash("successful logout")
     return redirect('/')
 
-@app.route('/users/<int:id>')
-def display_user(id):
-    form = UserForm()
-    password = form.password.data
-    username = form.username.data
-    email = form.email.data
-    first_name = form.first_name.data
-    last_name = form.last_name.data
-    user = User.query.get_or_404(id)
-    all_feedback = Feedback.query.all
+#--------------------------------
+# NEW FEEDBACK ROUTES
+#--------------------------------
+
+@app.route('/users/<int:id>/feedback/add', methods=['GET', 'POST'])
+def display_feedback_form():
     if 'user_id' not in session:
         flash("Please log in first", "danger")
         return redirect('/login')
-    if session['user_id'] == user.username:
-        return render_template('user_info.html', user=user, email=email, first_name=first_name, last_name=last_name)
+    if user.user_id == session['user_id']:
+       form = FeedbackForm()
+       new_feedback = Feedback(text=text, user_id=session['user_id'])
+       db.session.add(new_feedback)
+       db.session.commit()
+    
+    return render_template('add_feedback.html', form=form)
+
+@app.route('/feedback/<int:id>/update', methods=['POST'])
+def display_feedback_add():
+    if 'user_id' not in session:
+        flash("Please log in first", "danger")
+        return redirect('/login')
+    if user.user_id == session['user_id']:
+       form = FeedbackForm()
+       new_feedback = Feedback(text=text, user_id=session['user_id'])
+       db.session.add(new_feedback)
+       db.session.commit()
+    
+    return redirect('/users/int:id', form=form)
+
+@app.route('/feedback/<int:id>/update', methods=['GET'])
+def display_feedback_update_form():
+    if 'user_id' not in session:
+        flash("Please log in first", "danger")
+        return redirect('/login')
+    if user.user_id == session['user_id']:
+       form = FeedbackForm()
+    return render_template('add_feedback.html', form=form)

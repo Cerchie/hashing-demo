@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %} Stupid Twitter
+{% block title %} Stupid Twitter/Feedback
 {% endblock %}
 {% block content %}
 
@@ -7,6 +7,7 @@
 <b>Email: </b>{{user.email}}
 <b>First name: </b>{{user.first_name}}
 <b>Last name:</b> {{user.last_name}}
-
+FEEDBACK
+{{all_feedback}}
 
 {% endblock %}
