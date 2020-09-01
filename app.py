@@ -15,13 +15,15 @@ connect_db(app)
 db.create_all()
 
 toolbar = DebugToolbarExtension
-
+#--------------
+#display routes
+#--------------
 @app.route('/')
 def homepage():
     return render_template('index.html')
 
 @app.route('/tweets', methods=['GET', 'POST'])
-def show_tweets():
+def show_tweets(): 
     if "user_id" not in session:
         flash("please log in first", "danger")
         return redirect('/')
@@ -35,7 +37,9 @@ def show_tweets():
         flash('tweet created', "success")
         return redirect('/tweets')
     return render_template("tweets.html", form=form, tweets = all_tweets)
-
+#-------------------
+# DELETE ROUTES
+#-------------------
 @app.route('/tweets/<int:id>', methods=['POST'])
 def delete_tweet(id):
     """delete tweet"""
@@ -43,13 +47,43 @@ def delete_tweet(id):
         flash("Please log in first", "danger")
         return redirect('/login')
     tweet = Tweet.query.get_or_404(id)
+    flash('you do not have permission to do that')
     if tweet.user_id == session['user_id']:
         db.session.delete(tweet)
         db.session.commit()
         flash('tweet deleted', "primary")
         return redirect('/tweets')
-    flash('you do not have permission to do that')
+    
     return redirect('/tweets')
+
+@app.route('/feedback/<int:id>/delete', methods=['POST'])
+def delete_feedback(id):
+    """delete feedback"""
+    if 'user_id' not in session:
+        flash("Please log in first", "danger")
+        return redirect('/login')
+    feedback = Feedback.query.get_or_404(id)
+    flash('you do not have permission to do that')
+    if tweet.user_id == session['user_id']:
+        db.session.delete(feedback)
+        db.session.commit()
+        flash('feedback deleted', "primary")
+        return redirect('/users/<int:id>')
+    
+@app.route('/users/<int:id>/delete', methods=['POST'])
+def delete_user(id):
+    """delete user"""
+    if 'user_id' not in session:
+        flash("Please log in first", "danger")
+        return redirect('/login')
+    user = User.query.get_or_404(id)
+    flash('you do not have permission to do that')
+    if user.user_id == session['user_id']:
+        db.session.delete(feedback)
+        db.session.commit()
+        flash('feedback deleted', "primary")
+        return redirect('/')
+    
 
 @app.route('/register', methods=['GET', 'POST'])
 def register_user():
@@ -84,7 +118,7 @@ def login_user():
         if user:
             flash(f'welcome back{user.username}!', "info")
             session['user_id'] = user.username
-            return redirect('/users/<username>')
+            return redirect('/users/<int:id>')
         else:
             form.username.errors = ['invalid username/password']
 
@@ -96,14 +130,18 @@ def logout_user():
     flash("successful logout")
     return redirect('/')
 
-@app.route('/users/<username>')
-def display_user(username):
-    form = LoginForm()
+@app.route('/users/<int:id>')
+def display_user(id):
+    form = UserForm()
     password = form.password.data
     username = form.username.data
-    user = User.authenticate(User, username, password)
+    email = form.email.data
+    first_name = form.first_name.data
+    last_name = form.last_name.data
+    user = User.query.get_or_404(id)
+    all_feedback = Feedback.query.all
     if 'user_id' not in session:
         flash("Please log in first", "danger")
         return redirect('/login')
     if session['user_id'] == user.username:
-        return render_template('user_info.html', user=user)
+        return render_template('user_info.html', user=user, email=email, first_name=first_name, last_name=last_name)
