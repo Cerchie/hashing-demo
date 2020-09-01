@@ -80,12 +80,11 @@ def login_user():
     if form.validate_on_submit():
         username = form.username.data
         password = form.password.data
-
         user = User.authenticate(User, username, password)
         if user:
             flash(f'welcome back{user.username}!', "info")
-            session['user_id'] = user.id
-            return redirect('/tweets')
+            session['user_id'] = user.username
+            return redirect('/users/<username>')
         else:
             form.username.errors = ['invalid username/password']
 
@@ -96,3 +95,15 @@ def logout_user():
     session.pop('user_id')
     flash("successful logout")
     return redirect('/')
+
+@app.route('/users/<username>')
+def display_user(username):
+    form = LoginForm()
+    password = form.password.data
+    username = form.username.data
+    user = User.authenticate(User, username, password)
+    if 'user_id' not in session:
+        flash("Please log in first", "danger")
+        return redirect('/login')
+    if session['user_id'] == user.username:
+        return render_template('user_info.html', user=user)
