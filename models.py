@@ -8,14 +8,15 @@ def connect_db(app):
     db.app = app
     db.init_app(app)
 
-class Tweet(db.Model):
-    __tablename__ = 'tweets'
+class Feedback(db.Model):
+    __tablename__ = 'feedback'
 
     id = db.Column(db.Integer, primary_key= True, autoincrement =True)
-    text = db.Column(db.Text, nullable= False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    title = db.Column(db.String(100), nullable= False)
+    content = db.Column(db.Text, nullable=False)
+    username = db.Column(db.Text, db.ForeignKey('users.username'))
 
-    user = db.relationship("User", backref="tweets")
+    user = db.relationship("User", backref="feedback")
 
 class User(db.Model):
 
@@ -23,9 +24,15 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key= True, autoincrement =True)
 
-    username = db.Column(db.Text, nullable= False, unique= True)
+    username = db.Column(db.String(20), nullable= False, unique= True)
 
     password = db.Column(db.Text, nullable= False)
+
+    email = db.Column(db.String(50), nullable= False, unique= True)
+
+    first_name = db.Column(db.String(30), nullable= False)
+
+    last_name = db.Column(db.String(30), nullable= False)
 
     @classmethod
     def register(cls, username, pwd):

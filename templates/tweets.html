@@ -21,17 +21,23 @@
 
     <button class="btn btn-success" type="submit">Post Tweet</button>
 </form>
-<ul>
-    {% for tweet in tweets %}
-    <li>
 
-        <b> {{tweet.user.username}} </b> - {{tweet.text}}
-        {% if session['user_id'] == tweet.user_id%}
-        <form style="display: inline;" action="/tweets/delete">
-            <button class="btn btn-sm btn-danger">
-                X
-            </button></form> {% endif %}
-    </li>
-    {% endfor %}
-</ul>
+<div>{% for tweet in tweets %}
+    <div>
+        <div class="card my-4">
+            <div class="card-body">
+                <h5 class="card-title text-info">{{tweet.user.username}}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Date goes here</h6>
+                <p class="card-text">{{tweet.text}}</p>
+                {% if session['user_id'] == tweet.user_id%}
+                <form style="display: inline;" action="/tweets/{{tweet.id}}" method="POST">
+                    <button class="btn btn-sm btn-danger">
+                        X
+                    </button></form> {% endif %}
+            </div>
+        </div>
+
+    </div>
+    {% endfor %}</div>
+
 {% endblock %}
