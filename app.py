@@ -41,10 +41,6 @@ def show_tweets():
 @app.route('/users/<int:id>')
 def display_user(id):
     user = User.query.get_or_404(id)
-    all_feedback = Feedback.query.all()
-
-    db.session.add(all_feedback)
-    db.session.commit()
     if 'user_id' not in session:
         flash("Please log in first", "danger")
         return redirect('/login')
