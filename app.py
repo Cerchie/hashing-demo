@@ -211,9 +211,11 @@ def display_feedback_update_form(id):
                 content=content,
                 username=username,
             )
+    db.session.add(feedback)
+    db.session.commit()
     if 'user_id' not in session:
         flash("Please log in first", "danger")
         return redirect('/login')
-    if user.id == session['user_id']:
+    if feedback.user.id == session['user_id']:
        form2 = FeedbackForm()
     return render_template('add_feedback.html', form2=form2, user=user)
