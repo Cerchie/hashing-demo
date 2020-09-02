@@ -7,8 +7,8 @@
 
 <form method="POST">
     {{form2.hidden_tag()}}
-    {% for field in form 
-       if field.widget.input_type != 'hidden' %}
+    {% for field in form2 %}
+    {% if field.widget.input_type != 'hidden' %}
     <p>
         {{field.label}}
         {{field(class_="form-control")}}
@@ -17,6 +17,7 @@
         <span class="form-text text-danger">{{error}}</span>
         {% endfor %}
     </p>
+    {% endif %}
     {% endfor %}
     <button class="btn btn-success" type="submit" action="/users/{{user.id}}/feedback/add">Post Feedback</button>
 </form>

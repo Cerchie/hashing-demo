@@ -133,7 +133,7 @@ def login_user():
         if user:
             flash(f'welcome back{user.username}!', "info")
             session['user_id'] = user.username
-            return redirect('/users/<int:id>')
+            return redirect(f"/users/{user.id}")
         else:
             form.username.errors = ['invalid username/password']
 
@@ -157,10 +157,18 @@ def display_feedback_form(id):
         flash("Please log in first", "danger")
         return redirect('/login')
     if user.id == session['user_id']:
-       form = FeedbackForm()
-       new_feedback = Feedback(text=text, user_id=session['user_id'])
-       db.session.add(new_feedback)
-       db.session.commit()
+        if form.validate_on_submit():
+            title = form.title.data
+            content = form.content.data
+
+            feedback = Feedback(
+                title=title,
+                content=content,
+                username=username,
+            )
+
+            db.session.add(feedback)
+            db.session.commit()
     
     return render_template('add_feedback.html', form2= form2, user=user)
 
