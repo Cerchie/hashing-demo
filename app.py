@@ -115,7 +115,8 @@ def register_user():
             return render_template('register.html', form=form)
         session['user_id'] = new_user.id
         flash('Welcome! Successfully created your account!', "success")
-        return redirect('/add_feedback.html')
+        form2 = FeedbackForm()
+        return render_template('/add_feedback.html', form2=form2)
     return render_template('register.html', form=form)
 
 
@@ -149,17 +150,19 @@ def logout_user():
 #--------------------------------
 
 @app.route('/users/<int:id>/feedback/add', methods=['GET', 'POST'])
-def display_feedback_form():
+def display_feedback_form(id):
+    form2 = FeedbackForm()
+    user = User.query.get_or_404(id)
     if 'user_id' not in session:
         flash("Please log in first", "danger")
         return redirect('/login')
-    if user.user_id == session['user_id']:
+    if user.id == session['user_id']:
        form = FeedbackForm()
        new_feedback = Feedback(text=text, user_id=session['user_id'])
        db.session.add(new_feedback)
        db.session.commit()
     
-    return render_template('add_feedback.html', form=form)
+    return render_template('add_feedback.html', form2= form2, user=user)
 
 @app.route('/feedback/<int:id>/update', methods=['POST'])
 def display_feedback_add():

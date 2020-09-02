@@ -3,8 +3,22 @@
 {% endblock %}
 
 {% block content %}
+<h1>Viewing Feedback</h1>
 
-<button class="btn btn-success" type="submit">Post Feedback</button>
+<form method="POST">
+    {{form2.hidden_tag()}}
+    {% for field in form 
+       if field.widget.input_type != 'hidden' %}
+    <p>
+        {{field.label}}
+        {{field(class_="form-control")}}
+
+        {% for error in field.errors %}
+        <span class="form-text text-danger">{{error}}</span>
+        {% endfor %}
+    </p>
+    {% endfor %}
+    <button class="btn btn-success" type="submit" action="/users/{{user.id}}/feedback/add">Post Feedback</button>
 </form>
 
 <div>{% for feedb in feedback %}
