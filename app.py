@@ -198,25 +198,22 @@ def display_feedback_form(id):
     
     return render_template('add_feedback.html', form2= form2, user=user)
 
-@app.route('/feedback/<int:id>/update', methods=['POST'])
-def display_feedback_add():
-    if 'user_id' not in session:
-        flash("Please log in first", "danger")
-        return redirect('/login')
-    if user.user_id == session['user_id']:
-       form = FeedbackForm()
-       new_feedback = Feedback(text=text, user_id=session['user_id'])
-       db.session.add(new_feedback)
-       db.session.commit()
-    
-    return redirect('/users/int:id', form=form)
+
 
 @app.route('/feedback/<int:id>/update', methods=['GET', 'POST'])
 def display_feedback_update_form(id):
-    
-    if 'feedback.user' not in session:
+    form2 = FeedbackForm()
+    title = form2.title.data
+    content = form2.content.data
+    username = form2.username.data
+    feedback = Feedback(
+                title=title,
+                content=content,
+                username=username,
+            )
+    if 'user_id' not in session:
         flash("Please log in first", "danger")
         return redirect('/login')
-    if feedback.user == session['user_id']:
-       form = FeedbackForm()
-    return render_template('add_feedback.html', form=form, user=user)
+    if user.id == session['user_id']:
+       form2 = FeedbackForm()
+    return render_template('add_feedback.html', form2=form2, user=user)
