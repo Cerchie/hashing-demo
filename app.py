@@ -206,11 +206,7 @@ def display_feedback_update_form(id):
     title = form2.title.data
     content = form2.content.data
     username = form2.username.data
-    feedback = Feedback(
-                title=title,
-                content=content,
-                username=username,
-            )
+    feedback = Feedback.query.get_or_404(id)
     db.session.add(feedback)
     db.session.commit()
     if 'user_id' not in session:
@@ -218,4 +214,4 @@ def display_feedback_update_form(id):
         return redirect('/login')
     if feedback.user.id == session['user_id']:
        form2 = FeedbackForm()
-    return render_template('add_feedback.html', form2=form2, user=user)
+    return render_template("base.html")
