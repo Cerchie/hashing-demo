@@ -115,13 +115,16 @@ def register_user():
             return render_template('register.html', form=form)
         session['user_id'] = new_user.id
         flash('Welcome! Successfully created your account!', "success")
-        return redirect('/tweets')
+        return redirect('/add_feedback.html')
     return render_template('register.html', form=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login_user():
     form = LoginForm()
+    username = form.username.data
+    password = form.password.data
+    user = User.authenticate(User, username, password)
     if form.validate_on_submit():
         username = form.username.data
         password = form.password.data
@@ -133,7 +136,7 @@ def login_user():
         else:
             form.username.errors = ['invalid username/password']
 
-    return render_template("login.html", form=form)
+    return render_template("login.html", form=form, user=user)
 
 @app.route('/logout')
 def logout_user():
