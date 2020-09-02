@@ -40,4 +40,23 @@
     </div>
     {% endfor %}</div>
 
+<ul>
+    {% for feedback in user.feedback %}
+    <li>
+        {{ feedback.title }}
+        <small>{{ feedback.content }}</small>
+        {% if session['user_id'] == user.id%}
+        <form style="display: inline;" action="/users/{{user.id}}" method="POST">
+            <button class="btn btn-sm btn-danger">
+                X
+            </button></form> {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+
+{% if session['user_id'] == user.id%}
+<form style="display: inline;" action="/users/{{user.id}}" method="POST">
+    <button class="btn btn-sm btn-danger">
+        delete user
+    </button></form> {% endif %}
 {% endblock %}

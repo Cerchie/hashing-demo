@@ -8,6 +8,44 @@
 <b>First name: </b>{{user.first_name}}
 <b>Last name:</b> {{user.last_name}}
 FEEDBACK
-{{user.feedback}}
 
+
+
+<div>{% for feedb in feedback %}
+    <div>
+        <div class="card my-4">
+            <div class="card-body">
+                <h5 class="card-title text-info">{{feedback.user.username}}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Date goes here</h6>
+                <p class="card-text">{{feedback.text}}</p>
+                {% if session['user_id'] == feedback.user.id%}
+                <form style="display: inline;" action="/feedback/{{feedback.id}}" method="POST">
+                    <button class="btn btn-sm btn-danger">
+                        X
+                    </button></form> {% endif %}
+            </div>
+        </div>
+
+    </div>
+    {% endfor %}</div>
+
+<ul>
+    {% for feedback in user.feedback %}
+    <li>
+        {{ feedback.title }}
+        <small>{{ feedback.content }}</small>
+        {% if session['user_id'] == user.id%}
+        <form style="display: inline;" action="/feedback/{{feedback.id}}/delete" method="POST">
+            <button class="btn btn-sm btn-danger">
+                X
+            </button></form> {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+
+{% if session['user_id'] == user.id%}
+<form style="display: inline;" action="/users/{{user.id}}/delete" method="POST">
+    <button class="btn btn-sm btn-danger">
+        delete user
+    </button></form> {% endif %}
 {% endblock %}

@@ -44,7 +44,7 @@ def display_user(id):
     if 'user_id' not in session:
         flash("Please log in first", "danger")
         return redirect('/login')
-    if session['user_id'] == user.username:
+    if session['user_id'] == user.id:
         return render_template('user_info.html', user=user)
 #-------------------
 # DELETE ROUTES
@@ -73,11 +73,11 @@ def delete_feedback(id):
         return redirect('/login')
     feedback = Feedback.query.get_or_404(id)
     flash('you do not have permission to do that')
-    if tweet.user_id == session['user_id']:
+    if feedback.user.id == session['user_id']:
         db.session.delete(feedback)
         db.session.commit()
         flash('feedback deleted', "primary")
-        return redirect('/users/<int:id>')
+    return redirect(f'/users/{user.id}')
     
 @app.route('/users/<int:id>/delete', methods=['POST'])
 def delete_user(id):
@@ -87,8 +87,8 @@ def delete_user(id):
         return redirect('/login')
     user = User.query.get_or_404(id)
     flash('you do not have permission to do that')
-    if user.user_id == session['user_id']:
-        db.session.delete(feedback)
+    if user.id == session['user_id']:
+        db.session.delete(user)
         db.session.commit()
         flash('feedback deleted', "primary")
         return redirect('/')
@@ -98,26 +98,26 @@ def delete_user(id):
 #-------------
 @app.route('/register', methods=['GET', 'POST'])
 def register_user():
-    form = UserForm()
-    if form.validate_on_submit():
-        username = form.username.data
-        password = form.password.data
-        email = form.email.data
-        first_name = form.first_name.data
-        last_name = form.last_name.data
+    form2 = UserForm()
+    if form2.validate_on_submit():
+        username = form2.username.data
+        password = form2.password.data
+        email = form2.email.data
+        first_name = form2.first_name.data
+        last_name = form2.last_name.data
         new_user = User.register(username, password, email, first_name, last_name)
 
         db.session.add(new_user)
         try: 
             db.session.commit()
         except IntegrityError:
-            form.username.errors.append('Username taken. Pick another.')
-            return render_template('register.html', form=form)
+            form2.username.errors.append('Username taken. Pick another.')
+            return render_template('register.html', form2=form2)
         session['user_id'] = new_user.id
         flash('Welcome! Successfully created your account!', "success")
         form2 = FeedbackForm()
-        return render_template('/add_feedback.html', form2=form2)
-    return render_template('register.html', form=form)
+        
+    return render_template('register.html', form2=form2)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -132,7 +132,7 @@ def login_user():
         user = User.authenticate(User, username, password)
         if user:
             flash(f'welcome back{user.username}!', "info")
-            session['user_id'] = user.username
+            session['user_id'] = user.id
             return redirect(f"/users/{user.id}")
         else:
             form.username.errors = ['invalid username/password']
@@ -149,6 +149,29 @@ def logout_user():
 # NEW FEEDBACK ROUTES
 #--------------------------------
 
+# @app.route('/users/<int:id>/feedback/add', methods=['GET', 'POST'])
+# def display_feedback_form(id):
+#     form2 = FeedbackForm()
+#     user = User.query.get_or_404(id)
+#     if 'user_id' not in session:
+#         flash("Please log in first", "danger")
+#         return redirect('/login')
+#     if user.id == session['user_id']:
+#         if form2.validate_on_submit():
+#             title = form2.title.data
+#             content = form2.content.data
+#             username = form2.username.data
+#             feedback = Feedback(
+#                 title=title,
+#                 content=content,
+#                 username=username,
+#             )
+
+#             db.session.add(feedback)
+#             db.session.commit()
+#             return redirect(f"/users/{id}")
+#     return render_template('add_feedback.html', form2= form2, user=user)
+
 @app.route('/users/<int:id>/feedback/add', methods=['GET', 'POST'])
 def display_feedback_form(id):
     form2 = FeedbackForm()
@@ -156,10 +179,12 @@ def display_feedback_form(id):
     if 'user_id' not in session:
         flash("Please log in first", "danger")
         return redirect('/login')
+    print('***', user.id == session['user_id'])
     if user.id == session['user_id']:
-        if form.validate_on_submit():
-            title = form.title.data
-            content = form.content.data
+        if form2.validate_on_submit():
+            title = form2.title.data
+            content = form2.content.data
+            username = form2.username.data
 
             feedback = Feedback(
                 title=title,
@@ -169,6 +194,7 @@ def display_feedback_form(id):
 
             db.session.add(feedback)
             db.session.commit()
+            return redirect(f"/users/{id}")
     
     return render_template('add_feedback.html', form2= form2, user=user)
 
@@ -185,11 +211,12 @@ def display_feedback_add():
     
     return redirect('/users/int:id', form=form)
 
-@app.route('/feedback/<int:id>/update', methods=['GET'])
-def display_feedback_update_form():
-    if 'user_id' not in session:
+@app.route('/feedback/<int:id>/update', methods=['GET', 'POST'])
+def display_feedback_update_form(id):
+    
+    if 'feedback.user' not in session:
         flash("Please log in first", "danger")
         return redirect('/login')
-    if user.user_id == session['user_id']:
+    if feedback.user == session['user_id']:
        form = FeedbackForm()
-    return render_template('add_feedback.html', form=form)
+    return render_template('add_feedback.html', form=form, user=user)
